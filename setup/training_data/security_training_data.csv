@@ -1,0 +1,14 @@
+finding_type,resource_type,severity,description,is_public,is_encrypted,port_exposed,business_impact_score,recommended_action,estimated_breach_cost,confidence
+public_s3_bucket,s3,critical,S3 bucket open to everyone,1,0,0,95,Enable Block Public Access,500000,0.95
+open_security_group,ec2,critical,Security group allows SSH from 0.0.0.0/0,0,1,22,90,Restrict to specific IPs,250000,0.92
+unencrypted_rds,rds,high,Database without encryption,0,0,5432,75,Enable RDS encryption,100000,0.88
+public_rds,rds,critical,Database publicly accessible,1,0,5432,85,Disable public accessibility,300000,0.90
+unencrypted_s3,s3,high,S3 bucket not encrypted,0,0,0,60,Enable default encryption,50000,0.85
+public_ec2_instance,ec2,medium,EC2 has public IP,0,1,0,40,Move to private subnet,20000,0.75
+open_security_group,ec2,medium,Security group allows HTTP,0,1,80,30,Restrict to needed ports,10000,0.70
+unencrypted_rds,rds,medium,Database without backup,0,0,5432,50,Enable automated backups,30000,0.80
+iam_root_usage,iam,critical,Root account used for AWS operations,1,1,0,92,Use IAM users instead,200000,0.90
+cloudtrail_disabled,cloudtrail,high,CloudTrail is disabled,0,1,0,80,Enable CloudTrail for audit,75000,0.88
+default_vpc_usage,vpc,medium,Using default VPC without custom rules,0,1,0,45,Create custom VPC,15000,0.72
+mfa_not_enabled,iam,high,MFA not enabled for user accounts,0,1,0,70,Enable MFA on all accounts,100000,0.85
+public_snapshot,rds,high,RDS snapshot is public,1,0,0,65,Make snapshot private,80000,0.80

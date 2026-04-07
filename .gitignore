@@ -1,0 +1,15 @@
+.env
+.env.local
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.DS_Store
+*.log
+setup/model_training/output/
+.vscode/
+.idea/
+venv/
+env/
+node_modules/
+.streamlit/
