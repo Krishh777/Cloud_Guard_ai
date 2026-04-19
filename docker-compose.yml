@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: cloudguard-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: CloudGuard123!
+      POSTGRES_DB: cloudguard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./setup/database/init_postgres.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cloudguard
+    restart: unless-stopped
+
+  # Cloud Layer (ML Analysis)
+  cloud-layer:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile.cloud
+    container_name: cloudguard-cloud-layer
+    environment:
+      AWS_REGION: us-east-1
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: CloudGuard123!
+      DB_NAME: cloudguard
+      DB_PORT: 5432
+      DYNAMODB_TABLE_NAME: cloudguard-cache
+      DYNAMODB_REGION: us-east-1
+      CLOUD_API_ENDPOINT: http://localhost:8000
+      FOG_API_ENDPOINT: http://fog-layer:8001
+      SNS_ENABLED: "False"
+      LOG_LEVEL: INFO
+      MODELS_DIR: /app/setup/model_training/output
+    volumes:
+      - ./setup/model_training/output:/app/setup/model_training/output:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - cloudguard
+    restart: unless-stopped
+    command: >
+      bash -c "
+        echo '⏳ Waiting for PostgreSQL to be ready...' &&
+        sleep 10 &&
+        python cloud_layer/main_with_custom_model.py
+      "
+
+  # Fog Layer (Enrichment)
+  fog-layer:
+    build:
+      context: .
+      dockerfile: Docker/Dockerfile.fog
+    container_name: cloudguard-fog-layer
+    environment:
+      AWS_REGION: us-east-1
+      DYNAMODB_TABLE_NAME: cloudguard-cache
+      DYNAMODB_REGION: us-east-1
+      DYNAMODB_TTL: 3600
+      CLOUD_API_ENDPOINT: http://cloud-layer:8000
+      FOG_API_ENDPOINT: http://localhost:8001
+      LOG_LEVEL: INFO
+      PYTHONPATH: /app
+      USE_CACHE: "False"  # Disable AWS for demo
+      AWS_ACCESS_KEY_ID: "dummy"  # Prevent boto3 from looking for credentials
+      AWS_SECRET_ACCESS_KEY: "dummy"
+    ports:
+      - "8001:8001"
+    depends_on:
+      - cloud-layer
+    networks:
+      - cloudguard
+    restart: unless-stopped
+    working_dir: /app
+    command: bash -c "cd /app && python fog_layer/main.py"
+  # Streamlit Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: cloudguard-dashboard
+    environment:
+      FOG_API_ENDPOINT: http://fog-layer:8001
+      CLOUD_API_ENDPOINT: http://cloud-layer:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - fog-layer
+      - cloud-layer
+    networks:
+      - cloudguard
+    restart: unless-stopped
+    command: streamlit run dashboard/app.py --server.port=8501 --server.address=0.0.0.0
+
+volumes:
+  postgres_data:
+
+networks:
+  cloudguard:
+    driver: bridge

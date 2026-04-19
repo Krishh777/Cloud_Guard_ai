@@ -1,14 +1,84 @@
 finding_type,resource_type,severity,description,is_public,is_encrypted,port_exposed,business_impact_score,recommended_action,estimated_breach_cost,confidence
-public_s3_bucket,s3,critical,S3 bucket open to everyone,1,0,0,95,Enable Block Public Access,500000,0.95
-open_security_group,ec2,critical,Security group allows SSH from 0.0.0.0/0,0,1,22,90,Restrict to specific IPs,250000,0.92
-unencrypted_rds,rds,high,Database without encryption,0,0,5432,75,Enable RDS encryption,100000,0.88
-public_rds,rds,critical,Database publicly accessible,1,0,5432,85,Disable public accessibility,300000,0.90
-unencrypted_s3,s3,high,S3 bucket not encrypted,0,0,0,60,Enable default encryption,50000,0.85
-public_ec2_instance,ec2,medium,EC2 has public IP,0,1,0,40,Move to private subnet,20000,0.75
-open_security_group,ec2,medium,Security group allows HTTP,0,1,80,30,Restrict to needed ports,10000,0.70
-unencrypted_rds,rds,medium,Database without backup,0,0,5432,50,Enable automated backups,30000,0.80
-iam_root_usage,iam,critical,Root account used for AWS operations,1,1,0,92,Use IAM users instead,200000,0.90
-cloudtrail_disabled,cloudtrail,high,CloudTrail is disabled,0,1,0,80,Enable CloudTrail for audit,75000,0.88
-default_vpc_usage,vpc,medium,Using default VPC without custom rules,0,1,0,45,Create custom VPC,15000,0.72
-mfa_not_enabled,iam,high,MFA not enabled for user accounts,0,1,0,70,Enable MFA on all accounts,100000,0.85
-public_snapshot,rds,high,RDS snapshot is public,1,0,0,65,Make snapshot private,80000,0.80
+public_s3_bucket,s3,critical,S3 bucket open to everyone with read permissions,1,0,0,95,Enable Block Public Access on S3 bucket,500000,0.95
+open_security_group,ec2,critical,Security group allows SSH from 0.0.0.0/0 (port 22),0,1,22,90,Restrict SSH to specific IP ranges,250000,0.92
+unencrypted_rds,rds,high,RDS database without encryption at rest,0,0,5432,75,Enable RDS encryption using KMS,100000,0.88
+public_rds,rds,critical,RDS database publicly accessible from internet,1,0,5432,85,Disable PubliclyAccessible flag in RDS,300000,0.90
+unencrypted_s3,s3,high,S3 bucket missing default encryption,0,0,0,60,Enable default S3 encryption (SSE-S3 or KMS),50000,0.85
+public_ec2_instance,ec2,medium,EC2 instance has public IP address,0,1,0,40,Move EC2 to private subnet with NAT,20000,0.75
+open_security_group_http,ec2,medium,Security group allows HTTP on port 80 to 0.0.0.0/0,0,1,80,30,Restrict HTTP to load balancer only,10000,0.70
+unencrypted_rds_backup,rds,medium,RDS automated backups not encrypted,0,0,5432,50,Enable backup encryption in RDS settings,30000,0.80
+iam_root_usage,iam,critical,Root AWS account used for daily operations,1,1,0,92,Create IAM users and use those instead,200000,0.90
+cloudtrail_disabled,cloudtrail,high,CloudTrail logging disabled for account,0,1,0,80,Enable CloudTrail for all API logging,75000,0.88
+default_vpc_usage,vpc,medium,Using default VPC without custom security rules,0,1,0,45,Create custom VPC with proper segmentation,15000,0.72
+mfa_not_enabled,iam,high,Console access without MFA enabled,0,1,0,70,Enable MFA for all IAM users,100000,0.85
+public_snapshot,rds,high,RDS snapshot publicly accessible,1,0,0,65,Make RDS snapshot private and encrypted,80000,0.80
+s3_versioning_disabled,s3,medium,S3 bucket versioning disabled - no recovery,0,0,0,55,Enable versioning on critical S3 buckets,40000,0.78
+no_backup_plan,rds,high,RDS instance without automated backups,0,0,5432,75,Enable automated backups with 30-day retention,90000,0.84
+open_security_group_rdp,ec2,critical,Security group allows RDP from 0.0.0.0/0 (port 3389),0,1,3389,88,Restrict RDP to VPN IP only,280000,0.91
+lambda_no_vpc,lambda,medium,Lambda function not running in VPC,0,1,0,35,Deploy Lambda in private VPC subnet,12000,0.68
+dynamodb_unencrypted,dynamodb,high,DynamoDB table without encryption,0,0,0,72,Enable DynamoDB encryption with KMS,110000,0.86
+kinesis_unencrypted,kinesis,high,Kinesis stream without encryption,0,0,0,70,Enable Kinesis encryption,95000,0.83
+sns_unencrypted,sns,high,SNS topic without encryption,0,0,0,68,Enable SNS topic encryption,85000,0.82
+sqs_unencrypted,sqs,high,SQS queue without encryption,0,0,0,69,Enable SQS queue encryption,90000,0.83
+elastic_cache_unencrypted,elasticache,high,ElastiCache cluster without encryption,0,0,6379,71,Enable ElastiCache encryption in transit and at rest,105000,0.85
+public_elasticsearch,elasticsearch,critical,Elasticsearch cluster publicly accessible,1,0,9200,87,Restrict Elasticsearch to VPC access only,320000,0.89
+acm_certificate_expiring,acm,high,SSL/TLS certificate expiring within 30 days,0,1,443,65,Renew ACM certificate before expiration,75000,0.81
+elbv2_unencrypted,elb,medium,ALB/NLB listener using HTTP instead of HTTPS,0,0,80,38,Update listener to use HTTPS only,18000,0.74
+elbv2_no_access_logs,elb,medium,Load balancer access logging disabled,0,1,443,42,Enable access logging for compliance,22000,0.76
+cloudfront_no_https,cloudfront,high,CloudFront distribution allows HTTP,0,0,80,73,Enforce HTTPS and disable HTTP,120000,0.87
+cloudfront_no_waf,cloudfront,medium,CloudFront not protected by AWS WAF,0,1,443,48,Enable AWS WAF on CloudFront,35000,0.79
+kms_key_rotation,kms,medium,KMS key rotation disabled,0,1,0,50,Enable automatic KMS key rotation,28000,0.77
+s3_bucket_logging_disabled,s3,medium,S3 bucket access logging disabled,0,0,0,52,Enable S3 bucket access logs,32000,0.75
+iam_policy_too_permissive,iam,high,IAM policy with wildcard permissions (*),1,1,0,78,Create least-privilege IAM policies,130000,0.87
+iam_access_key_rotation,iam,high,IAM access keys not rotated in 90 days,0,1,0,74,Rotate old access keys and delete unused,115000,0.86
+security_group_no_description,ec2,low,Security group rules without description,0,1,0,15,Add descriptions to security group rules,5000,0.65
+unused_security_group,ec2,low,Security group is not attached to any resources,0,1,0,12,Delete unused security groups,3000,0.60
+unused_elastic_ip,ec2,low,Elastic IP allocated but not in use,0,1,0,18,Release unused Elastic IPs,8000,0.62
+ami_no_backup_tags,ec2,medium,AMI images missing backup schedule tags,0,0,0,36,Add lifecycle tags to AMIs,16000,0.70
+lambda_no_dead_letter,lambda,medium,Lambda function without dead-letter queue,0,1,0,32,Configure DLQ for async Lambda invocations,14000,0.67
+lambda_timeout_too_high,lambda,low,Lambda function timeout set to maximum,0,1,0,20,Reduce Lambda timeout to appropriate value,7000,0.63
+autoscaling_no_tags,autoscaling,low,Auto Scaling group missing mandatory tags,0,1,0,22,Add required tags to ASG,9000,0.64
+rds_multi_az_disabled,rds,high,RDS instance without Multi-AZ deployment,0,1,5432,76,Enable Multi-AZ for high availability,105000,0.85
+rds_public_snapshot,rds,critical,RDS snapshot accidentally shared publicly,1,0,5432,86,Make RDS snapshots private immediately,310000,0.91
+rds_deletion_protection,rds,medium,RDS deletion protection not enabled,0,1,5432,44,Enable deletion protection on critical databases,26000,0.73
+rds_backup_retention,rds,medium,RDS backup retention less than 7 days,0,1,5432,43,Increase backup retention to minimum 7 days,25000,0.72
+rds_enhanced_monitoring,rds,medium,RDS enhanced monitoring disabled,0,1,5432,40,Enable RDS enhanced monitoring,21000,0.71
+dynamodb_backup_disabled,dynamodb,high,DynamoDB PITR (point-in-time recovery) disabled,0,0,0,73,Enable DynamoDB point-in-time recovery,115000,0.86
+dynamodb_no_ttl,dynamodb,low,DynamoDB table with no TTL for old records,0,0,0,16,Configure TTL on old records for auto cleanup,6000,0.61
+ecr_image_scan_disabled,ecr,medium,ECR repository without image scanning,0,1,0,37,Enable ECR image scanning on push,17000,0.69
+ecr_unencrypted,ecr,medium,ECR repository using default encryption,0,1,0,39,Use KMS encryption for ECR repositories,19000,0.70
+iam_policy_full_access,iam,critical,IAM role has AdministratorAccess policy,1,1,0,89,Create custom policy with least privilege,220000,0.89
+iam_console_password_policy,iam,high,Weak password policy for IAM console,0,1,0,71,Enforce strong password requirements,100000,0.84
+network_acl_too_permissive,vpc,high,Network ACL allows all traffic,0,1,0,72,Restrict NACL rules to required ports,108000,0.85
+vpc_flow_logs_disabled,vpc,medium,VPC Flow Logs disabled for network monitoring,0,1,0,41,Enable VPC Flow Logs for all VPCs,23000,0.72
+internet_gateway_not_needed,vpc,low,Internet Gateway on private subnet,0,1,0,19,Remove unneeded Internet Gateways,6500,0.62
+nat_gateway_unused,vpc,low,NAT Gateway exists but unused,0,1,0,17,Delete unused NAT Gateways,7500,0.61
+vpc_peering_unencrypted,vpc,medium,VPC Peering connection without encryption,0,1,0,46,Use VPN or encrypted tunnels for VPC peering,31000,0.74
+transit_gateway_unencrypted,vpc,medium,Transit Gateway without encryption,0,1,0,47,Enable Transit Gateway encryption,33000,0.75
+cloudformation_drift_detected,cloudformation,medium,CloudFormation stack has drift from template,0,1,0,49,Detect and remediate CloudFormation drift,29000,0.76
+s3_public_access_block,s3,high,S3 bucket with public access block disabled,0,0,0,79,Enable Block Public Access on S3,125000,0.88
+s3_bucket_acl_public,s3,critical,S3 bucket ACL set to public-read or public-read-write,1,0,0,93,Change ACL to private,480000,0.94
+s3_bucket_policy_public,s3,critical,S3 bucket policy allows public access,1,0,0,94,Update bucket policy to restrict public access,490000,0.93
+s3_bucket_cross_account,s3,high,S3 bucket accessible by cross-account principal,1,0,0,77,Review and restrict cross-account access,120000,0.86
+s3_object_lock_disabled,s3,medium,S3 Object Lock not enabled for compliance,0,0,0,51,Enable S3 Object Lock for immutability,35000,0.77
+s3_requester_pays,s3,low,S3 Requester Pays option enabled,0,1,0,21,Disable unless intentionally needed,8500,0.63
+secrets_manager_rotation,secretsmanager,high,Secrets Manager secret not rotated,0,1,0,75,Enable automatic secret rotation,112000,0.86
+secrets_manager_unencrypted,secretsmanager,high,Secrets not encrypted with KMS,0,0,0,74,Use KMS for secret encryption,110000,0.85
+ssm_parameter_unencrypted,ssm,medium,Systems Manager Parameter Store using default key,0,1,0,45,Use custom KMS key for Parameter Store,27000,0.73
+monitoring_alarms_missing,cloudwatch,medium,CloudWatch alarms not configured,0,1,0,43,Create alarms for critical metrics,24000,0.71
+logs_retention_too_long,logs,low,CloudWatch Logs retention set to indefinite,0,1,0,23,Set appropriate log retention period,9000,0.64
+logs_not_encrypted,logs,medium,CloudWatch Logs not encrypted,0,1,0,44,Enable CloudWatch Logs encryption,25500,0.72
+eventbridge_rule_no_dlq,events,low,EventBridge rule without dead letter queue,0,1,0,24,Configure DLQ for EventBridge rules,10000,0.65
+cost_anomaly_detection,ce,low,Cost Anomaly Detection not enabled,0,1,0,25,Enable Cost Anomaly Detection,11000,0.66
+unused_nat_gateway,vpc,low,NAT Gateway running but not used,0,1,0,26,Delete unused NAT gateways ($32/month),12000,0.67
+unused_ebs_volume,ec2,low,EBS volume unattached for 30+ days,0,1,0,27,Delete or attach unused volumes,13000,0.68
+ebs_volume_unencrypted,ec2,high,EBS volume without encryption,0,0,0,76,Enable EBS encryption for new volumes,118000,0.87
+ebs_snapshot_public,ec2,critical,EBS snapshot accidentally made public,1,0,0,84,Make EBS snapshot private immediately,290000,0.89
+ebs_snapshot_unencrypted,ec2,medium,EBS snapshot without encryption,0,0,0,53,Ensure snapshots are encrypted,38000,0.78
+guardduty_not_enabled,guardduty,high,AWS GuardDuty not enabled for threat detection,0,1,0,77,Enable GuardDuty in all AWS regions,128000,0.88
+security_hub_not_enabled,securityhub,high,AWS Security Hub not enabled,0,1,0,78,Enable Security Hub for compliance,132000,0.88
+config_not_enabled,config,high,AWS Config not enabled for resource tracking,0,1,0,76,Enable AWS Config for audit trail,125000,0.87
+macie_not_enabled,macie,medium,Amazon Macie not enabled for data discovery,0,1,0,54,Enable Macie to discover sensitive data,42000,0.79
+waf_not_attached,waf,high,WAF rule created but not attached to resource,0,1,0,72,Attach WAF to ALB or CloudFront,116000,0.86
+security_group_default_open,ec2,critical,Default security group allows all traffic,0,1,0,91,Restrict default security group rules,270000,0.91
+database_deletion_protection,rds,high,RDS database deletion protection disabled,0,1,5432,77,Enable deletion protection on production DBs,126000,0.87
