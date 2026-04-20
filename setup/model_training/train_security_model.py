@@ -11,6 +11,8 @@ import os
 import sys
 import pickle
 from datetime import datetime, timezone
+from pathlib import Path
+
 
 # ML Libraries
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor
@@ -42,6 +44,7 @@ class SecurityRiskModel:
         """Load CSV and prepare for training"""
         logger.info(f"📊 Loading data from {data_path}")
         
+        data_path = Path(__file__).parent / "data" / "security_training_data.csv"
         df = pd.read_csv(data_path)
         logger.info(f"✅ Loaded {len(df)} training examples")
         logger.info(f"Columns: {list(df.columns)}")

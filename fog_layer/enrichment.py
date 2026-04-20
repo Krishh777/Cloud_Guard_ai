@@ -366,3 +366,4 @@ class RiskEnrichment:
         logger.info(f"   Severity: {severity} | Risk: {risk_score} | Cost: ${breach_cost:,}")
         
         return enriched
+    
