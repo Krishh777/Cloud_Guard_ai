@@ -412,22 +412,6 @@ scikit-learn for excellent ML algorithms
 FastAPI for modern Python web framework
 Streamlit for rapid dashboard development
 Open-source community for amazing tools
-📞 Support
-For issues, questions, or suggestions:
-
-Issues: Create GitHub issue
-Email: support@example.com
-Documentation: Check docs/ folder
-🚀 Roadmap
-Q2 2024
- Multi-account scanning
- Lambda function scanning
- CloudFront configuration validation
-Q3 2024
- Compliance mapping (CIS, PCI-DSS)
- Automated remediation
- Slack/Teams integration
-Q4 2024
  Predictive analytics
  Advanced ML (deep learning)
  Industry benchmarks
